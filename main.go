@@ -19,7 +19,8 @@ func main() {
 	r := gin.Default()
 
 	api := r.Group("/api/v1")
-	api.POST("user", userHandler.RegisterUser)
+	api.POST("registration", userHandler.RegisterUser)
+	api.POST("login", userHandler.Login)
 
 	r.Run("localhost:9000")
 }
