@@ -109,8 +109,10 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	// Harus dapat dari JWT
-	userId := 1
+
+	// dapat dari JWT Middleware
+	currentUser := c.MustGet("currentUser").(user.User)
+	userId := currentUser.ID
 
 	file, err := c.FormFile("avatar")
 	if err != nil {
