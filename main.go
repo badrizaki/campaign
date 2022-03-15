@@ -2,6 +2,7 @@ package main
 
 import (
 	"campaign/auth"
+	"campaign/campaign"
 	"campaign/config"
 	"campaign/handler"
 	"campaign/helper"
@@ -31,14 +32,22 @@ func main() {
 	}
 	userHandler := handler.NewUserHandler(userService, authService)
 
+	campaignRepository := campaign.NewRepository(db)
+	campaignService := campaign.NewService(campaignRepository)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
+
 	// r := routes.SetupRoutes(db)
 	r := gin.Default()
+	r.Static("/images", "./images")
 
 	api := r.Group("/api/v1")
 	api.POST("registration", userHandler.RegisterUser)
 	api.POST("login", userHandler.Login)
 	api.POST("email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	api.GET("campaigns", campaignHandler.GetCampaigns)
+	api.GET("campaign/:id", campaignHandler.GetCampaign)
 
 	r.Run("localhost:9000")
 }

@@ -1,15 +1,33 @@
 package campaign
 
-import "time"
+import (
+	"campaign/user"
+	"time"
+)
 
-type Campagin struct {
-	ID             int
-	Name           string
-	Occupation     string
-	Email          string
-	PasswordHash   string
-	AvatarFileName string
-	Role           string
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+type Campaign struct {
+	ID              int
+	UserID          int
+	Name            string
+	FullName        string
+	ShorDescription string
+	Description     string
+	Perks           string
+	BackerCount     int
+	GoalAmount      int
+	CurrentAmount   int
+	Slug            string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	CampaignImages  []CampaignImage
+	User            user.User
+}
+
+type CampaignImage struct {
+	ID         int
+	CampaignID int
+	FileName   string
+	IsPrimary  int
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
