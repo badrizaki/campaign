@@ -1,6 +1,7 @@
 package campaign
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gosimple/slug"
@@ -10,6 +11,7 @@ type Service interface {
 	GetCampaigns(userId int) ([]Campaign, error)
 	GetCampaign(input GetCampaignDetailInput) (Campaign, error)
 	CreateCampaign(input CreateCampaignInput) (Campaign, error)
+	UpdateCampaign(inputID GetCampaignDetailInput, input CreateCampaignInput) (Campaign, error)
 }
 
 type service struct {
@@ -44,9 +46,28 @@ func (s *service) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
 	campaign.Perks = input.Perks
 	campaign.UserID = input.User.ID
 
-	slugCandidate := fmt.Sprintf("%s %s", input.Name, input.User.ID)
+	slugCandidate := fmt.Sprintf("%s %d", input.Name, input.User.ID)
 	campaign.Slug = slug.Make(slugCandidate)
 
-	newCampaign, err := s.repository.Save(campaign)
-	return newCampaign, err
+	return s.repository.Save(campaign)
+}
+
+func (s *service) UpdateCampaign(inputID GetCampaignDetailInput, input CreateCampaignInput) (Campaign, error) {
+	campaign, err := s.repository.FindByID(inputID.ID)
+	if err != nil {
+		return campaign, err
+	}
+
+	if input.User.ID != campaign.UserID {
+		return campaign, errors.New("user not allowed update data")
+	}
+
+	campaign.Name = input.Name
+	campaign.ShortDescription = input.ShortDescription
+	campaign.Description = input.Description
+	campaign.GoalAmount = input.GoalAmount
+	campaign.Perks = input.Perks
+	campaign.UserID = input.User.ID
+
+	return s.repository.Update(campaign)
 }
